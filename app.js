@@ -79,7 +79,7 @@ function gameStep(guess, solution) {
 //console.log(gameStep("abuse", "tests"))
 //console.log(gameStep("abuse", "about"))
 
-function playOneGame(solution, guesses, gameRes, silent = true) {
+function playOneStep(guesses, gameRes, silent = true) {
   silent || console.log("=========================")
   silent || console.log(guesses)
   const words = filterWords(gameRes.fix, gameRes.contains, gameRes.notContains)
@@ -96,11 +96,19 @@ function playOneGame(solution, guesses, gameRes, silent = true) {
   if(newGuessesPro[Object.keys(newGuessesPro)[0]] < newGuessesCon[Object.keys(newGuessesCon)[0]]){
     if(Object.keys(newGuessesPro).length > 3) {
       newGuess = Object.keys(newGuessesCon)[0]
+      const equals = Object.entries(newGuessesCon).filter(([,s]) => s === newGuessesCon[newGuess]).map(([k,]) => k)
+      newGuess = equalTactics(guesses, gameRes, equals, silent)
     }
   } else {
     const equals = Object.entries(newGuessesPro).filter(([,s]) => s === newGuessesPro[newGuess]).map(([k,]) => k)
     newGuess = equalTactics(guesses, gameRes, equals, silent)
   }
+
+  return newGuess
+}
+
+function playOneGame(solution, guesses, gameRes, silent = true) {
+  const newGuess = playOneStep(guesses, gameRes, silent)
 
   if(guesses.indexOf(newGuess)>=0) {
     guesses.push(newGuess)
@@ -184,6 +192,15 @@ function results() {
 
 }
 
-//console.log(playOneGame("notes", [], startingGameState, false))
+//test a single word
+//console.log(playOneGame("rarer", [], startingGameState, false))
+
+//test all word and write the output to result.json
 //run()
-//results()
+
+//statistics from result.json
+results()
+
+
+//fix indexed from 0
+//console.log(playOneStep(["arose"], {fix: {0: "a", 4:"e"}, contains: ["a", "e"], notContains: ["r", "o", "s"]}, false))
